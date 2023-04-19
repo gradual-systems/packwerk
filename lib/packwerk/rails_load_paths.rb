@@ -39,7 +39,7 @@ module Packwerk
         params(all_paths: T::Hash[String, Module], bundle_path: Pathname, rails_root: Pathname)
           .returns(T::Hash[Pathname, Module])
       end
-      def filter_relevant_paths(all_paths, bundle_path: Bundler.bundle_path, rails_root: Rails.root)
+      def filter_relevant_paths(all_paths, bundle_path: Bundler.bundle_path, rails_root: Pathname.pwd)
         bundle_path_match = bundle_path.join("**")
         rails_root_match = rails_root.join("**")
 
@@ -50,7 +50,7 @@ module Packwerk
       end
 
       sig { params(load_paths: T::Hash[Pathname, Module], rails_root: Pathname).returns(T::Hash[String, Module]) }
-      def relative_path_strings(load_paths, rails_root: Rails.root)
+      def relative_path_strings(load_paths, rails_root: Pathname.pwd)
         load_paths.transform_keys { |path| Pathname.new(path).relative_path_from(rails_root).to_s }
       end
 
