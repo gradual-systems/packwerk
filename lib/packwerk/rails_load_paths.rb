@@ -1,9 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "bundler"
-gem "railties", ">= 6.0"
-require "rails/railtie"
+require 'packs'
 
 module Packwerk
   # Extracts the load paths from the analyzed application so that we can map constant names to paths.
