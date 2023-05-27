@@ -296,5 +296,21 @@ module Packwerk
 
       cli.execute_command(["check", "--offenses-formatter=default", "--packages=components/platform"])
     end
+
+    test "#execute_command parses parallel option and overrides the configuration" do
+      use_template(:skeleton)
+
+      config = Configuration.new({ "parallel" => false })
+      refute config.parallel?
+      cli = ::Packwerk::Cli.new(configuration: config, out: StringIO.new)
+      cli.execute_command(["check", "--parallel"])
+      assert config.parallel?
+
+      config = Configuration.new({ "parallel" => true })
+      assert config.parallel?
+      cli = ::Packwerk::Cli.new(configuration: config, out: StringIO.new)
+      cli.execute_command(["check", "--no-parallel"])
+      refute config.parallel?
+    end
   end
 end
