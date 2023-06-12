@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 magnus = { version = "0.5.4" }
-pks = { path = "../../../packs" }
+pks = { path = "../../../pks" }
 serde = "~1"
 serde_magnus = "~0.2"
 

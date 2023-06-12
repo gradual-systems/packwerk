@@ -40,11 +40,13 @@ module Packwerk
 
       cache_dir = run_context.cache_directory
 
-      processed_files_hashes = RustParser.get_unresolved_references(Pathname.pwd, cache_dir, @relative_file_set.to_a)
+      processed_files = T.let(nil, T.untyped)
+      puts "Starting RustParser..."
+      bm = Benchmark.measure do
+        processed_files_hashes = RustParser.get_unresolved_references(Pathname.pwd, cache_dir, @relative_file_set.to_a)
 
-      processed_files = processed_files_hashes.map do |processed_file_hash|
-        FileProcessor::ProcessedFile.new(
-          unresolved_references: processed_file_hash[:unresolved_references].map do |unresolved_reference_hash|
+        processed_files = processed_files_hashes.map do |processed_file_hash|
+          unresolved_references = processed_file_hash[:unresolved_references].map do |unresolved_reference_hash|
             UnresolvedReference.new(
               constant_name: unresolved_reference_hash[:constant_name],
               namespace_path: unresolved_reference_hash[:namespace_path],
@@ -55,8 +57,12 @@ module Packwerk
               )
             )
           end
-        )
+
+          FileProcessor::ProcessedFile.new(unresolved_references: unresolved_references)
+        end
       end
+
+      puts "RustParser took #{bm.real} seconds"
       Parallel.flat_map(processed_files, &get_offenses_proc)
     end
 
