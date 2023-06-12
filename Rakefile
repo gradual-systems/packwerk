@@ -19,4 +19,12 @@ Rake::TestTask.new("test:loading") do |t|
   t.warning = false
 end
 
-task(default: :test)
+require "rb_sys/extensiontask"
+
+task build: :compile
+
+RbSys::ExtensionTask.new("rust_core") do |ext|
+  ext.lib_dir = "lib/rust_core"
+end
+
+task default: %i[compile test]

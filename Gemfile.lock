@@ -9,6 +9,7 @@ PATH
       constant_resolver (>= 0.2.0)
       parallel
       parser
+      rb_sys (~> 0.9.39)
       sorbet-runtime (>= 0.5.9914)
       zeitwerk (>= 2.6.1)
 
@@ -94,6 +95,9 @@ GEM
       zeitwerk (~> 2.5)
     rainbow (3.1.1)
     rake (13.0.6)
+    rake-compiler (1.2.3)
+      rake
+    rb_sys (0.9.78)
     rbi (0.0.15)
       ast
       parser (>= 2.6.4.0)
@@ -175,6 +179,7 @@ GEM
     zeitwerk (2.6.4)
 
 PLATFORMS
+  arm64-darwin-22
   ruby
   x86_64-darwin
   x86_64-darwin-20
@@ -186,8 +191,11 @@ DEPENDENCIES
   minitest-focus
   mocha
   packwerk!
+  pry
   railties
   rake
+  rake-compiler
+  rb_sys (~> 0.9.63)
   rubocop-performance
   rubocop-shopify
   rubocop-sorbet

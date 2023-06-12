@@ -10,6 +10,9 @@ require "active_support/core_ext/string"
 # Provides Object#to_json
 require "active_support/core_ext/object/json"
 
+# Provides the Rust parser
+require_relative "rust_core/rust_core"
+
 module Packwerk
   extend ActiveSupport::Autoload
 

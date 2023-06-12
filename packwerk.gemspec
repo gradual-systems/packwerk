@@ -33,6 +33,8 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables << "packwerk"
 
+  spec.extensions = ["ext/rust_core/Cargo.toml"]
+
   spec.files = Dir.chdir(__dir__) do
     %x(git ls-files -z).split("\x0").reject { |f| f.match(%r{^(test|spec|features|static)/}) }
   end
@@ -55,4 +57,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency("better_html")
 
   spec.add_development_dependency("railties")
+
+  # needed until rubygems supports Rust support is out of beta
+  spec.add_dependency "rb_sys", "~> 0.9.39"
+
+  # only needed when developing or packaging your gem
+  spec.add_development_dependency "rake-compiler", "~> 1.2.0"
+
+  # Helpful for local debugging
+  spec.add_development_dependency("pry")
 end

@@ -25,3 +25,6 @@ group :development do
   gem("sorbet-static-and-runtime")
   gem("zeitwerk")
 end
+
+gem "rake-compiler"
+gem "rb_sys", "~> 0.9.63"
