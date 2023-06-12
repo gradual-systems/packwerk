@@ -10,6 +10,8 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-magnus = { version = "0.4" }
+magnus = { version = "0.5.4" }
 pks = { path = "../../../packs" }
+serde = "~1"
+serde_magnus = "~0.2"
 

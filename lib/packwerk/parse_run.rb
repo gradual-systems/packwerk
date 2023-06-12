@@ -40,7 +40,23 @@ module Packwerk
 
       cache_dir = run_context.cache_directory
 
-      processed_files = RustParser.get_unresolved_references(Pathname.pwd, cache_dir, @relative_file_set.to_a)
+      processed_files_hashes = RustParser.get_unresolved_references(Pathname.pwd, cache_dir, @relative_file_set.to_a)
+
+      processed_files = processed_files_hashes.map do |processed_file_hash|
+        FileProcessor::ProcessedFile.new(
+          unresolved_references: processed_file_hash[:unresolved_references].map do |unresolved_reference_hash|
+            UnresolvedReference.new(
+              constant_name: unresolved_reference_hash[:constant_name],
+              namespace_path: unresolved_reference_hash[:namespace_path],
+              relative_path: unresolved_reference_hash[:relative_path],
+              source_location: Node::Location.new(
+                line: unresolved_reference_hash[:line_number],
+                column: unresolved_reference_hash[:column],
+              )
+            )
+          end
+        )
+      end
       Parallel.flat_map(processed_files, &get_offenses_proc)
     end
 
