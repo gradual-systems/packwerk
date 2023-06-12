@@ -38,7 +38,9 @@ module Packwerk
         raise "Serial mode not supported for now"
       end
 
-      processed_files = RustParser.get_unresolved_references(Pathname.pwd, @relative_file_set)
+      cache_dir = run_context.cache_directory
+
+      processed_files = RustParser.get_unresolved_references(Pathname.pwd, cache_dir, @relative_file_set.to_a)
       Parallel.flat_map(processed_files, &get_offenses_proc)
     end
 

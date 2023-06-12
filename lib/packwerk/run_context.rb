@@ -103,6 +103,11 @@ module Packwerk
       @package_set ||= ::Packwerk::PackageSet.load_all_from(@root_path, package_pathspec: @package_paths)
     end
 
+    sig { returns(Pathname) }
+    def cache_directory
+      @cache_directory
+    end
+
     private
 
     sig { returns(FileProcessor) }
