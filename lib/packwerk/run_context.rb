@@ -73,10 +73,22 @@ module Packwerk
       )
     end
 
-    sig { params(relative_file: String).returns(T::Array[Packwerk::Offense]) }
-    def process_file(relative_file:)
-      processed_file = file_processor.call(relative_file)
+    sig { params(processed_files: T::Array[FileProcessor::ProcessedFile]).returns(T::Array[Packwerk::Offense]) }
+    def offenses_for_processed_files(processed_files)
+      processed_files.flat_map do |processed_file|
+        offenses_for_processed_file(processed_file: processed_file)
+      end
+    end
 
+    # sig { params(relative_file: String).returns(T::Array[Packwerk::Offense]) }
+    # def process_file(relative_file:)
+    #   processed_file = file_processor.call(relative_file)
+
+    #   offenses_for_processed_file(processed_file)
+    # end
+
+    sig { params(processed_file: FileProcessor::ProcessedFile).returns(T::Array[Packwerk::Offense]) }
+    def offenses_for_processed_file(processed_file:)
       references = ReferenceExtractor.get_fully_qualified_references_from(
         processed_file.unresolved_references,
         context_provider

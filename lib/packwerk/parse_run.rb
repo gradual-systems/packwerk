@@ -7,8 +7,8 @@ module Packwerk
   class ParseRun
     extend T::Sig
 
-    ProcessFileProc = T.type_alias do
-      T.proc.params(path: String).returns(T::Array[Offense])
+    GetOffensesProc = T.type_alias do
+      T.proc.params(processed_file: FileProcessor::ProcessedFile).returns(T::Array[Offense])
     end
 
     sig do
@@ -32,15 +32,14 @@ module Packwerk
       ).returns(T::Array[Offense])
     end
     def find_offenses(run_context, on_interrupt: nil, &block)
-      process_file_proc = process_file_proc(run_context, &block)
+      get_offenses_proc = get_offenses_proc(run_context, &block)
 
-      offenses = if @parallel
-        Parallel.flat_map(@relative_file_set, &process_file_proc)
-      else
-        serial_find_offenses(on_interrupt: on_interrupt, &process_file_proc)
+      if !@parallel
+        raise "Serial mode not supported for now"
       end
 
-      offenses
+      processed_files = RustParser.get_unresolved_references(Pathname.pwd, @relative_file_set)
+      Parallel.flat_map(processed_files, &get_offenses_proc)
     end
 
     private
@@ -49,38 +48,18 @@ module Packwerk
       params(
         run_context: RunContext,
         block: T.nilable(T.proc.params(offenses: T::Array[Offense]).void)
-      ).returns(ProcessFileProc)
+      ).returns(GetOffensesProc)
     end
-    def process_file_proc(run_context, &block)
+    def get_offenses_proc(run_context, &block)
       if block
-        T.let(proc do |relative_file|
-          run_context.process_file(relative_file: relative_file).tap(&block)
-        end, ProcessFileProc)
+        T.let(proc do |processed_file|
+          run_context.offenses_for_processed_file(processed_file: processed_file).tap(&block)
+        end, GetOffensesProc)
       else
-        T.let(proc do |relative_file|
-          run_context.process_file(relative_file: relative_file)
-        end, ProcessFileProc)
+        T.let(proc do |processed_file|
+          run_context.offenses_for_processed_file(processed_file: processed_file)
+        end, GetOffensesProc)
       end
-    end
-
-    sig do
-      params(
-        on_interrupt: T.nilable(T.proc.void),
-        block: ProcessFileProc
-      ).returns(T::Array[Offense])
-    end
-    def serial_find_offenses(on_interrupt: nil, &block)
-      all_offenses = T.let([], T::Array[Offense])
-      begin
-        @relative_file_set.each do |relative_file|
-          offenses = yield(relative_file)
-          all_offenses.concat(offenses)
-        end
-      rescue Interrupt
-        on_interrupt&.call
-        all_offenses
-      end
-      all_offenses
     end
   end
 
